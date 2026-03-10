@@ -21,6 +21,11 @@ on:
         description: Directory with patches
         required: true
         type: string
+      jdks:
+        default: '21,25'
+        description: JDK versions to build for
+        required: true
+        type: string
 jobs:
   check-tag:
     runs-on: ubuntu-latest
@@ -82,6 +87,7 @@ jobs:
     uses: testpatchesorg/cross-cluster-replication-patches/.github/workflows/build-and-test.yml@main
     with:
       ref: ${{ needs.prepare.outputs.custom-branch }}
+      jdks: ${{ inputs.jdks }}
 
   release:
     name: Create release

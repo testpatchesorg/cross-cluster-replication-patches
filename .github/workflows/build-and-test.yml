@@ -8,11 +8,21 @@ on:
         description: Branch or tag to build
         required: true
         type: string
+      jdks:
+        default: '21,25'
+        description: JDK versions to build for
+        required: true
+        type: string
   workflow_call:
     inputs:
       ref:
         default: main
         description: Branch or tag to build
+        required: true
+        type: string
+      jdks:
+        default: '21,25'
+        description: JDK versions to build for
         required: true
         type: string
 # We build for all combinations but run tests only on one combination (linux & latest java)
@@ -21,15 +31,25 @@ jobs:
     uses: opensearch-project/opensearch-build/.github/workflows/get-ci-image-tag.yml@main
     with:
       product: opensearch
-
+  set-jdk:
+    runs-on: ubuntu-latest
+    outputs:
+      jdks: ${{ steps.jdks-list.outputs.jdks_json }}
+    steps:
+      - name: Set JDKs list
+        id: jdks-list
+        run: |
+          input="${{ inputs.jdks }}"
+          cleaned=$(echo "$input" | tr -d '[:space:]')
+          array=$(jq -Rc 'split(",") | map(select(. != ""))' <<< "$cleaned")
+          echo "jdks_json=$array" >> $GITHUB_OUTPUT
   build-test-linux:
     strategy:
       matrix:
-        java: [21, 25]
-
+        java: ${{ fromJSON(needs.set-jdk.outputs.jdks) }}
     name: Build CCR Plugin on Linux using Container Image
     runs-on: ubuntu-latest
-    needs: Get-CI-Image-Tag
+    needs: [Get-CI-Image-Tag,set-jdk]
     container:
       # using the same image which is used by opensearch-build team to build the OpenSearch Distribution
       # this image tag is subject to change as more dependencies and updates will arrive over time
