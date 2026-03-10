@@ -30,6 +30,7 @@ jobs:
         with:
           check-tag: true
           tag-name: ${{ inputs.tag }}
+          create-tag: false
   prepare:
     needs: check-tag
     permissions:
@@ -85,6 +86,8 @@ jobs:
   release:
     name: Create release
     needs: [prepare, build]
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - name: Create tag ${{ inputs.tag }}
