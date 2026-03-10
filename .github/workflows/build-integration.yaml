@@ -1,0 +1,104 @@
+---
+
+name: Integration Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      ccr-tag:
+        default: 3.4.0.0
+        description: cross-cluster-replication tag or branch to apply patches to
+        required: true
+        type: string
+
+      tag:
+        default: 3.4.0.0-patched
+        description: Tag name to tag the build and attach artifacts
+        required: true
+        type: string
+      patches-dir:
+        default: patches/3.4.0.0
+        description: Directory with patches
+        required: true
+        type: string
+jobs:
+  check-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check tag
+        uses: netcracker/qubership-workflow-hub/actions/tag-action@v2.1.1
+        with:
+          check-tag: true
+          tag-name: ${{ inputs.tag }}
+  prepare:
+    needs: check-tag
+    permissions:
+      contents: write
+    outputs:
+      custom-branch: ${{ steps.output.outputs.custom_branch }}
+    name: Apply cross-cluster-replication (${{ inputs.ccr-tag }}) patches (${{ inputs.patches-dir }})
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set output
+        id: output
+        run: |
+          echo "custom_branch=applied-patches-${{ github.event.inputs.ccr-tag }}-${{ github.run_id }}" >> $GITHUB_OUTPUT
+
+      - name: Checkout cross-cluster-replication source
+        uses: actions/checkout@v6
+        with:
+          repository: opensearch-project/cross-cluster-replication
+          ref: ${{ inputs.ccr-tag }}
+          path: cross-cluster-replication
+
+      - name: Checkout patches
+        uses: actions/checkout@v6
+        with:
+          path: ccr-patches
+
+      - name: Apply patches
+        run: |
+          cd ${GITHUB_WORKSPACE}/cross-cluster-replication
+          for p in ../ccr-patches/patches/${{ inputs.patches-dir }}/*.patch; do
+            echo "Applying $p..."
+            git apply -p1 --ignore-space-change --ignore-whitespace "$p"
+          done
+
+      - name: Create a new branch and commit changes
+        run: |
+          cd ${GITHUB_WORKSPACE}/ccr-patches
+          mv -f ${GITHUB_WORKSPACE}/cross-cluster-replication/* .
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          git checkout -b "${{ steps.output.outputs.custom_branch }}"
+          git add .
+          git commit -m "Applied custom patches to cross-cluster-replication ${{ inputs.ccr-tag }}"
+          git push origin "${{ steps.output.outputs.custom_branch }}"
+
+  build:
+    needs: prepare
+    name: Build patched cross-cluster-replication
+    uses: testpatchesorg/cross-cluster-replication-patches/.github/workflows/build-and-test.yml@main
+    with:
+      ref: ${{ needs.prepare.outputs.custom-branch }}
+
+  release:
+    name: Create release
+    needs: [prepare, build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create tag ${{ inputs.tag }}
+        uses: netcracker/qubership-workflow-hub/actions/tag-action@v2.1.1
+        with:
+          create-release: true
+          create-tag: true
+          ref: ${{ needs.prepare.outputs.custom-branch }}
+      - name: Download artifacts
+        uses: actions/download-artifact@v7
+        with:
+          path: artifacts
+      - name: Upload assets to release ${{ inputs.tag }}
+        uses: netcracker/qubership-workflow-hub/actions/assets-action@v2.1.1
+        with:
+          ref: ${{ inputs.tag }}
+          folders: artifacts
