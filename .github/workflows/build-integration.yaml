@@ -115,3 +115,4 @@ jobs:
         with:
           files: "artifacts/*"
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+          release-tag: ${{ inputs.tag }}
