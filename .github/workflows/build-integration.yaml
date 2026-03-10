@@ -111,7 +111,7 @@ jobs:
         with:
           path: artifacts
       - name: Upload assets to release ${{ inputs.tag }}
-        uses: netcracker/qubership-workflow-hub/actions/assets-action@v2.1.1
+        uses: AButler/upload-release-assets@v3.0
         with:
-          ref: ${{ inputs.tag }}
-          folders: artifacts
+          files: "artifacts/*"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
