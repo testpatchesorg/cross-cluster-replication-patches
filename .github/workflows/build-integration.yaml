@@ -60,7 +60,7 @@ jobs:
       - name: Apply patches
         run: |
           cd ${GITHUB_WORKSPACE}/cross-cluster-replication
-          for p in ../ccr-patches/patches/${{ inputs.patches-dir }}/*.patch; do
+          for p in ../ccr-patches/${{ inputs.patches-dir }}/*.patch; do
             echo "Applying $p..."
             git apply -p1 --ignore-space-change --ignore-whitespace "$p"
           done
