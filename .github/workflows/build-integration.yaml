@@ -97,12 +97,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create tag ${{ inputs.tag }}
+        env:
+          GH_TOKEN: ${{ github.token }}
         uses: netcracker/qubership-workflow-hub/actions/tag-action@v2.1.1
         with:
           create-release: true
           create-tag: true
           ref: ${{ needs.prepare.outputs.custom-branch }}
           tag-name: ${{ inputs.tag }}
+
       - name: Download artifacts
         uses: actions/download-artifact@v7
         with:
