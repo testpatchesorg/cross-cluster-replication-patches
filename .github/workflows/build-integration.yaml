@@ -96,6 +96,7 @@ jobs:
           create-release: true
           create-tag: true
           ref: ${{ needs.prepare.outputs.custom-branch }}
+          tag-name: ${{ inputs.tag }}
       - name: Download artifacts
         uses: actions/download-artifact@v7
         with:
