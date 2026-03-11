@@ -103,6 +103,7 @@ jobs:
         with:
           create-release: true
           create-tag: true
+          draft-release: "false"
           ref: ${{ needs.prepare.outputs.custom-branch }}
           tag-name: ${{ inputs.tag }}
 
