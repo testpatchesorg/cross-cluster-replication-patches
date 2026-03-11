@@ -28,6 +28,7 @@ on:
         type: string
 jobs:
   check-tag:
+    name: Check tag ${{ inputs.tag }} existence
     runs-on: ubuntu-latest
     steps:
       - name: Check tag

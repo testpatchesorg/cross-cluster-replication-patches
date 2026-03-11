@@ -32,6 +32,7 @@ jobs:
     with:
       product: opensearch
   set-jdk:
+    name: Set target JDKs list
     runs-on: ubuntu-latest
     outputs:
       jdks: ${{ steps.jdks-list.outputs.jdks_json }}
