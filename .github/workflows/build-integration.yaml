@@ -110,6 +110,7 @@ jobs:
         uses: actions/download-artifact@v7
         with:
           path: artifacts
+          merge-multiple: true
       - name: Upload assets to release ${{ inputs.tag }}
         uses: AButler/upload-release-assets@v3.0
         with:
