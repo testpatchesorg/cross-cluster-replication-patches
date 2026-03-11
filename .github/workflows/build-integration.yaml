@@ -6,23 +6,23 @@ on:
   workflow_dispatch:
     inputs:
       ccr-tag:
-        default: 3.4.0.0
+        default: 2.19.4.0
         description: cross-cluster-replication tag or branch to apply patches to
         required: true
         type: string
 
       tag:
-        default: 3.4.0.0-patched
+        default: 2.19.4.0-patched
         description: Tag name to tag the build and attach artifacts
         required: true
         type: string
       patches-dir:
-        default: patches/3.4.0.0
+        default: patches/2.19.4.0
         description: Directory with patches
         required: true
         type: string
       jdks:
-        default: '21,25'
+        default: '11,17'
         description: JDK versions to build for
         required: true
         type: string

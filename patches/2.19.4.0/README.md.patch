@@ -1,0 +1,12 @@
+diff --git a/README.md b/README.md
+index ee66e36..4378467 100644
+--- a/README.md
++++ b/README.md
+@@ -164,3 +164,7 @@ This project is licensed under the Apache-2.0 License.
+ ## Copyright
+
+ Copyright OpenSearch Contributors. See [NOTICE](NOTICE) for details.
++
++## Patch test
++
++A new line to test file patch implementation
