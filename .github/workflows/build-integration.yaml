@@ -1,7 +1,7 @@
 ---
 
 name: Integration Build
-
+run-name: "CCR: ${{ inputs.ccr-tag }} | Patches: ${{ inputs.patches-dir }} | Tag: ${{ inputs.tag }} | JDKs: ${{ inputs.jdks }}"
 on:
   workflow_dispatch:
     inputs:
