@@ -111,7 +111,7 @@ jobs:
         uses: actions/download-artifact@v7
         with:
           path: artifacts
-          merge-multiple: true
+          merge-multiple: false
       - name: Debug
         run: |
           echo "=========================================================="
