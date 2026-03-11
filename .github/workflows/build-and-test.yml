@@ -88,6 +88,15 @@ jobs:
         run: |
           mkdir -p cross-cluster-replication-artifacts
           cp ./build/distributions/*.zip cross-cluster-replication-artifacts
+          cd cross-cluster-replication-artifacts
+          for file in *.zip; do
+            [[ -f "$file" ]] || continue
+            name="${file%.zip}"
+            new_name="${name}-${{ matrix.java }}.zip"
+            if [[ "$name" != "$new_name" ]]; then
+              mv -i -- "$file" "$new_name"
+            fi
+          done
       - name: Upload artifacts
         uses: actions/upload-artifact@v6.0.0
         with:
