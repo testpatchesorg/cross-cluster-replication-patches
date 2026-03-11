@@ -111,9 +111,16 @@ jobs:
         with:
           path: artifacts
           merge-multiple: true
+      - name: Debug
+        run: |
+          echo "=========================================================="
+          echo "GITHUB_WORKSPACE: ${GITHUB_WORKSPACE}"
+          echo "Artifacts:"
+          ls -laR ${GITHUB_WORKSPACE}/artifacts
+
       - name: Upload assets to release ${{ inputs.tag }}
         uses: AButler/upload-release-assets@v3.0
         with:
-          files: "artifacts/*"
+          files: "artifacts/**/*"
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ inputs.tag }}
